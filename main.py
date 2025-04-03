@@ -21,7 +21,18 @@ uic.loadUi('chatbot_with_button.ui', MainWindow)  # Qt Designer에서 만든 .ui
 
 # [핵심 함수] 질문 전송 및 응답 처리 함수 정의
 def handle_send():
-  pass
+  category = MainWindow.categoryCombo.currentText()         # 현재 선택된 카테고리 텍스트 가져오기
+  question = MainWindow.questionInput.text().strip()        # 입력된 질문 텍스트 가져오기 및 공백 제거
+  if not question:                                          # 질문이 비어 있으면
+    QMessageBox.warning(MainWindow, "입력 오류", "질문을 입력하세요.")  # ✅ 경고 팝업 창 띄우기
+    MainWindow.questionInput.setFocus()                   # 질문 입력창에 포커스 다시 맞추기
+    return                                               # 함수 종료
+
+  system_prompt = PROMPTS.get(category, "당신은 친절한 어시스턴트입니다.")  # 선택된 카테고리의 시스템 메시지 가져오기
+  messages = [                                               # ChatGPT 메시지 형식 구성
+      {"role": "system", "content": system_prompt},
+      {"role": "user", "content": question}
+  ]  
 
 
 # 윈도우 기본 설정 및 이벤트 연결
@@ -29,6 +40,7 @@ MainWindow.setWindowTitle("ChatGPT LLM App")                     # 창 제목 �
 MainWindow.sendButton.clicked.connect(handle_send)               # 전송 버튼 클릭 시 handle_send 함수 실행
 MainWindow.questionInput.returnPressed.connect(handle_send)      # ✅ 엔터키로 질문 전송 가능하게 연결
 MainWindow.clearButton.clicked.connect(lambda: MainWindow.questionInput.clear())  # ✅ 초기화 버튼 클릭 시 입력창 비우기
+
 
 MainWindow.categoryCombo.addItems(PROMPTS.keys())                # 카테고리 콤보박스에 프롬프트 키 추가
 MainWindow.questionInput.returnPressed.connect(handle_send)      # 질문 입력창에서 엔터키 입력 시 handle_send 함수 실행 -(중복이지만 문제 없음) 엔터 입력 이벤트 연결
