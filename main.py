@@ -32,7 +32,32 @@ def handle_send():
   messages = [                                               # ChatGPT 메시지 형식 구성
       {"role": "system", "content": system_prompt},
       {"role": "user", "content": question}
-  ]  
+  ]
+
+  try:
+    response = client.chat.completions.create(            # OpenAI API 호출하여 응답 받기 (client.chat.completions.create(...)를 통해 받은 OpenAI 응답 객체)
+      model=MODEL_NAME,                                   # 사용할 모델 설정
+      messages=messages,                                  # 메시지 리스트 전달
+    )
+    answer = response.choices[0].message.content.strip() # 응답 객체 안에는 choices라는 리스트가 포함되어 있고, 그 안에 다양한 응답 결과가 담겨 있음
+                                                         # 대부분의 경우 GPT는 한 개의 응답만 반환하므로 choices[0]으로 첫 번째 응답 선택지를 가져옴
+                                                         # choices[0]에는 이런 구조
+                                                          # {
+                                                          #   "message": {
+                                                          #     "role": "assistant",
+                                                          #     "content": "여기에는 실제 GPT의 응답 텍스트가 들어 있습니다."
+                                                          #   }
+                                                          # }
+                                                          # .strip() : 문자열 앞뒤의 공백 문자(띄어쓰기, 줄바꿈 등) 을 제거하는 함수
+
+
+  except Exception as e:                                  # 예외 발생 시
+    answer = f"(오류 발생: {e})"                           # 에러 메시지를 출력용 문자열로 설정
+
+  MainWindow.answerOutput.setPlainText(answer or "(답변을 생성할 수 없습니다)")  # 출력 창에 답변 표시
+
+  #MainWindow.questionInput.clear()  # ✅ (선택사항) 입력창 자동 초기화 - 주석 처리 하면 입력창에 질문이 남아 있음
+  MainWindow.questionInput.setFocus()  # 질문 입력창에 포커스 맞추기
 
 
 # 윈도우 기본 설정 및 이벤트 연결
