@@ -1,0 +1,34 @@
+classDiagram
+    class MainWindow {
+        +QMainWindow 객체
+    }
+    
+    class ConfigParser {
+        +config.ini 파일 읽기
+        +API 키 및 설정 제공
+    }
+    
+    class OpenAIClient {
+        +API 키로 초기화
+        +chat.completions.create() 호출
+    }
+    
+    class UIComponents {
+        +categoryCombo
+        +questionInput
+        +answerOutput
+        +sendButton
+        +clearButton
+    }
+    
+    class EventHandlers {
+        +handle_send()
+        +clearButton.clicked
+        +questionInput.returnPressed
+    }
+    
+    MainWindow --> UIComponents : 포함
+    MainWindow --> EventHandlers : 이벤트 연결
+    EventHandlers --> OpenAIClient : API 호출
+    ConfigParser --> OpenAIClient : API 키 제공
+    ConfigParser --> UIComponents : 카테고리 제공
